@@ -45,14 +45,14 @@ spec:
           readOnly: true
           name: nginx-conf
         env:
-        - name: NGNX_USERNAME
+        - name: NGINX_USERNAME
           valueFrom:
-            secretKeyREf:
+            secretKeyRef:
               name: sf-auth-nginx
               key: username
-        - name: NGNX_PASSWORD
+        - name: NGINX_PASSWORD
           valueFrom:  
-            secretKeyREf:
+            secretKeyRef:
               name: sf-auth-nginx
               key: password
       volumes:
