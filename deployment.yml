@@ -26,7 +26,7 @@ kind: Deployment
 metadata:
   name: nginx
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: nginx
@@ -44,6 +44,17 @@ spec:
         - mountPath: /etc/nginx
           readOnly: true
           name: nginx-conf
+        env:
+        - name: NGNX_USERNAME
+          valueFrom:
+            secretKeyREf:
+              name: sf-auth-nginx
+              key: username
+        - name: NGNX_PASSWORD
+          valueFrom:  
+            secretKeyREf:
+              name: sf-auth-nginx
+              key: password
       volumes:
       - name: nginx-conf
         configMap:
@@ -58,11 +69,19 @@ kind: Service
 metadata:
   name: sf-webserver
 spec:
-  type: NodePort
   ports:
-  - port: 80
-    protocol: TCP
+  - protocol: TCP
+    port: 80
     targetPort: 80
-    nodePort: 30008
   selector:
-    app: nginx 
+    app: nginx
+
+---
+apiVersion: v1
+kind: Secret
+metadata:
+  name: sf-auth-nginx
+type: kubernetes.io/basic-auth
+stringData:
+  username: user-sf
+  password: password-sf

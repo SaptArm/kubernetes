@@ -1,5 +1,5 @@
 {
     "yaml.schemas": {
-        "kubernetes://schema/apps/v1%40deployment": "file:///home/user/kubernetes/deployment.yml"
+        "https://json.schemastore.org/sourcehut-build-0.65.0.json": "file:///home/user/kubernetes/deployment.yml"
     }
 }
