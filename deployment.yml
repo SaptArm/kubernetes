@@ -1,3 +1,4 @@
+---
 apiVersion: v1
 kind: ConfigMap
 metadata:
@@ -21,6 +22,10 @@ data:
         }
       }
     }
+
+  private.conf: |
+    user1:$apr1$rqtc1hjx$V02eLeTHZF9b1Ab9MR/VV1
+
 
 ---
 apiVersion: apps/v1
@@ -46,18 +51,18 @@ spec:
         - mountPath: /etc/nginx
           readOnly: true
           name: nginx-conf
-        - mountPath: /etc/nginx
-          name: auth-nginx
+#        - mountPath: /etc/nginx
+#          name: auth-nginx
         env:
-        - name: NGINX_USERNAME
+        - name: nginx-username
           valueFrom:
             secretKeyRef:
-              name: sf-auth-nginx
+              name: auth-basic
               key: username
-        - name: NGINX_PASSWORD
+        - name: nginx-password
           valueFrom:  
             secretKeyRef:
-              name: sf-auth-nginx
+              name: auth-basic
               key: password
       volumes:
       - name: nginx-conf
@@ -66,29 +71,42 @@ spec:
           items:
           - key: nginx.conf
             path: nginx.conf
-      - name: auth-nginx
-        configMap:
-          name: nginx-htppass
+          - key: private.conf
+            path: .htpasswd
 
 ---
+#apiVersion: v1
+#kind: Service
+##metadata:
+#  name: sf-webserver
+#spec:
+#  ports:
+#  - protocol: TCP
+#    port: 80
+#    targetPort: 80
+#  selector:
+#    app: nginx
 apiVersion: v1
 kind: Service
 metadata:
   name: sf-webserver
+  labels:
+    app: nginx
 spec:
-  ports:
-  - protocol: TCP
-    port: 80
-    targetPort: 80
+  type: ClusterIP
   selector:
     app: nginx
+  ports:
+  - port: 80
+    targetPort: 8080
+    protocol: TCP
 
 ---
 apiVersion: v1
 kind: Secret
 metadata:
-  name: sf-auth-nginx
+  name: auth-basic
 type: kubernetes.io/basic-auth
 stringData:
-  username: user-sf
-  password: password-sf
+  username: user1
+  password: password1
